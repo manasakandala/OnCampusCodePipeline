@@ -122,6 +122,7 @@ Resources:
       RoleArn: !GetAtt CodePipelineExecutionRole.Arn
       RestartExecutionOnUpdate: true
       Stages:
+        #Stage 1
         - Name: Source
           Actions:
             - Name: SourceCodeRepo
@@ -137,8 +138,11 @@ Resources:
               OutputArtifacts:
                 - Name: SourceCodeAsZip
               RunOrder: 1
+        
+        #Stage 2
         - Name: UpdatePipeline
           Actions:
+            #Stage 2 Part 1
             - Name: CreateChangeSet
               ActionTypeId:
                 Category: Deploy
@@ -160,6 +164,8 @@ Resources:
               InputArtifacts:
                 - Name: SourceCodeAsZip
               RunOrder: 1
+
+            #Stage 2 Part 2  
             - Name: ExecuteChangeSet
               ActionTypeId:
                 Category: Deploy
@@ -189,6 +195,7 @@ Resources:
         #       InputArtifacts:
         #         - Name: SourceCodeAsZip
 
+        #Stage 3
         - !If
           - IsFeatureBranchPipeline
           - Name: BuildAndDeployFeatureStack
@@ -205,6 +212,7 @@ Resources:
                   - Name: SourceCodeAsZip
           - !Ref AWS::NoValue
 
+        #Stage 4
         - !If
           - IsMainBranchPipeline
           - Name: BuildAndPackage
@@ -223,6 +231,7 @@ Resources:
                   - Name: BuildArtifactAsZip
           - !Ref AWS::NoValue
 
+        #Stage 5
         - !If
           - IsMainBranchPipeline
           - Name: DeployTest
@@ -262,6 +271,7 @@ Resources:
               #   RunOrder: 2
           - !Ref AWS::NoValue
 
+        #Stage 6
         - !If
           - IsMainBranchPipeline
           - Name: DeployProd
@@ -651,3 +661,5 @@ Outputs:
     Condition: CreateConnection
     Description: The Arn of AWS CodeStar Connection used to connect to external code repositories.
     Value: !Ref CodeStarConnection
+
+#somecomments
